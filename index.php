@@ -15,6 +15,6 @@
             <input name="password" type="password" placeholder="Enter Password"/>
             <input type="submit"/>
         </form>
-        <?php include('main.php'); ?>
+        
     </body>
 </html>
