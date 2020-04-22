@@ -1,16 +1,8 @@
 <?php
-    function connect(){     
-        include("accountcreds.php");
-        $db = mysqli_connect($hostname, $username, $password, $project);
-        if (mysqli_connect_errno()){
-            echo "Failed to connect to MySQL: " . mysqli_connect_error();
-            exit();
-        }
-        return $db;
-    }
-
+    include("functions.php");
     function getQuery($docid, $pub, $title){
-        $query =  "SELECT DISTINCT D.TITLE, P.PUBNAME, B.LNAME, count(DISTINCT C.COPYNO) 
+        //$query =  "SELECT DISTINCT D.DOCID, D.TITLE, P.PUBNAME, B.LNAME, B.LIBID, count(DISTINCT C.COPYNO) 
+        $query = "SELECT *
             FROM COPY AS C, DOCUMENT AS D, PUBLISHER AS P, BRANCH AS B
                     WHERE C.DOCID=D.DOCID
                     AND P.PUBLISHERID = D.PUBLISHERID
@@ -24,7 +16,7 @@
         if($title != ""){
             $query .= " AND D.TITLE = '$title'";
         }
-        $query .= " GROUP BY C.LIBID, D.TITLE, D.DOCID";
+        //$query .= " GROUP BY C.LIBID, D.TITLE, D.DOCID";
         return $query;
     }
 
@@ -32,15 +24,19 @@
         $title = $row["TITLE"];
         $branch = $row["LNAME"];
         $pub = $row["PUBNAME"];
-        $count = $row["count(DISTINCT C.COPYNO)"];
+        $id = $row["DOCID"];
+        $copyno = $row["COPYNO"];
+        $card = $_GET["card"];
+        $libid = $row["LIBID"];
         echo "
                 <form action=action.php> 
                     <h3>$title</h3>
                     <p>$branch</p> 
                     <p>$pub</p>
-                    <p>$count Copies</p>
-                    <button name=Borrow value=$title/$branch >Borrow</button>
-                    <button name=Reserve value=$title/$branch >Reserve</button>
+                    <p>Copy Number: $copyno</p>
+                    <input type=hidden name=data value=$id/$libid/$copyno/$card />
+                    <button name=type value=borrow >Borrow</button>
+                    <button name=type value=reserve >Reserve</button>
                 </form>";
     }
 
