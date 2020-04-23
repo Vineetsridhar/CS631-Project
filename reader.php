@@ -27,21 +27,59 @@
         ";
     }
 
-    function createBookItem($row){
+    function createBorrowBookItem($row){
         $title = $row["TITLE"];
         $lib = $row["LNAME"];
         $copyno = $row["COPYNO"];
         $bornum = $row["BORNUM"];
         $cardno = $row["CARDNUM"];
         echo "
-            <form action=action.php>
+                <form action=action.php>
                 <input type=hidden name=data value=$bornum/$cardno />
                 <h3>$title</h3>
                 <p>$lib</p>
                 <p>Copy $copyno</p>
                 <button name=type value=return >Return</button>
             </form>
-        ";
+        ";       
+    }
+
+    function createReserveBookItem($row){
+        $title = $row["TITLE"];
+        $lib = $row["LNAME"];
+        $time = $row["DTIME"];
+        $cardno = $row["CARDNUM"];
+        $docid = $row["DOCID"];
+        $libid = $row["LIBID"];
+        $copyno = $row["COPYNO"];
+        echo "
+            <form action=action.php>
+                <input type=hidden name=data value=$docid/$libid/$copyno/$cardno />
+                <h3>$title</h3>
+                <p>$lib</p>
+                <p>Reserved at: $time</p>
+                <button name=type value=borrow >Borrow</button>
+            </form>
+        ";       
+    }
+
+    function populateBooks($db, $query, $res){
+        $action = $res ? " reserved" : " borrowed";
+        ($table = mysqli_query($db,$query)) or die (mysqli_error($db));
+        if(mysqli_num_rows($table) == 0){
+            echo "No books" . $action;
+        }
+        while ($row = mysqli_fetch_array($table, MYSQLI_ASSOC)){
+            if($res)
+                createReserveBookItem($row);
+            else
+                createBorrowBookItem($row);
+        }
+    }
+
+    function deleteOldReserved($db){
+        $query = "DELETE FROM RESERVES WHERE DTIME < DATE_SUB(CURDATE(), INTERVAL 6 HOUR)";
+        mysqli_query($db, $query);
     }
 
     function getBorrowedBooks($db, $card){
@@ -52,14 +90,19 @@
             B.LIBID = BR.LIBID AND 
             R.CARDNUM='$card' AND
             B.RDTIME IS NULL";
-     
-        ($table = mysqli_query($db,$query)) or die (mysqli_error($db));
-        if(mysqli_num_rows($table) == 0){
-            echo "No books borrowed";
-        }
-        while ($row = mysqli_fetch_array($table, MYSQLI_ASSOC)){
-            createBookItem($row);
-        }
+        populateBooks($db, $query, false);
+    }
+
+    function getReservedBooks($db, $card){
+        deleteOldReserved($db);
+        $query = "SELECT *
+            FROM RESERVES AS RES, READER AS R, BRANCH AS B, DOCUMENT AS D
+            WHERE RES.READERID = R.READERID AND
+            RES.DOCID = D.DOCID AND
+            RES.LIBID = B.LIBID AND
+            R.CARDNUM = '$card'";
+        
+        populateBooks($db, $query, true);
     }
 
     function getFine($db, $readerid){
@@ -90,7 +133,11 @@
     $readerid = $row["READERID"];
     printToScreen("<h1>Welcome $name</h1>");
     searchFunctionality($card);
+    printToScreen("<h3>Your Borrowed Books...</h3>");
     getBorrowedBooks($db, $card);
-    echo "<br/>Fine: " . getFine($db, $readerid);
+    printToScreen("<h3>Your Reserved Books...</h3>");
+    getReservedBooks($db, $card);
+
+    printToScreen("<br/>Fine: $" . getFine($db, $readerid));
     mysqli_close($db);
 ?>   
