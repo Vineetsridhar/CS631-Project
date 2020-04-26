@@ -28,11 +28,13 @@
         $copyno = $row["COPYNO"];
         $card = $_GET["card"];
         $libid = $row["LIBID"];
+        $docid = $row["DOCID"];
         echo "
                 <form action=action.php> 
                     <h3>$title</h3>
                     <p>$branch</p> 
                     <p>$pub</p>
+                    <p>Doc Id: $docid</p>
                     <p>Copy Number: $copyno</p>
                     <input type=hidden name=data value=$id/$libid/$copyno/$card />
                     <button name=type value=borrow >Borrow</button>

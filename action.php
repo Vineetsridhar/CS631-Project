@@ -71,6 +71,10 @@
     }
     function borrowBook($db, $docid, $libid, $readerid, $copyno, $cardno){
         deleteFromReserved($db, $docid, $libid, $readerid, $copyno);
+        if(!isDocumentAvailable($db, $docid, $libid, $copyno)){
+            $error = "Sorry this book is not available right now.";
+            showError($db, $cardno, $error);
+        }
         if(!isEligible($db, $cardno)){
             $error = "Error, you can only borrow and reserve a maximum of 10 documents. Redirecting you...";
             showError($db, $cardno, $error);
@@ -82,6 +86,10 @@
     }
 
     function reserveBook($db, $docid, $libid, $readerid, $copyno, $cardno){
+        if(!isDocumentAvailable($db, $docid, $libid, $copyno)){
+            $error = "Sorry this book is not available right now.";
+            showError($db, $cardno, $error);
+        }
         if(!isEligible($db, $cardno)){
             $error = "Error, you can only borrow and reserve a maximum of 10 items. Redirecting you...";
             showError($db, $cardno, $error);
@@ -106,10 +114,6 @@
         $copyno = $data[2];
         $cardno = $data[3];
         $readerid = getReaderID($db, $cardno);
-        if(!isDocumentAvailable($db, $docid, $libid, $copyno)){
-            $error = "Sorry this book is not available right now.";
-            showError($db, $cardno, $error);
-        }
         if($type == "borrow"){
             borrowBook($db, $docid, $libid, $readerid, $copyno, $cardno);
         } else{
