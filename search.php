@@ -3,10 +3,12 @@
     function getQuery($docid, $pub, $title){
         //$query =  "SELECT DISTINCT D.DOCID, D.TITLE, P.PUBNAME, B.LNAME, B.LIBID, count(DISTINCT C.COPYNO) 
         $query = "SELECT *
-            FROM COPY AS C, DOCUMENT AS D, PUBLISHER AS P, BRANCH AS B
+            FROM COPY AS C, DOCUMENT AS D, PUBLISHER AS P, BRANCH AS B, AUTHOR AS A, WRITES AS W
                     WHERE C.DOCID=D.DOCID
                     AND P.PUBLISHERID = D.PUBLISHERID
-                    AND C.LIBID = B.LIBID" ;
+                    AND C.LIBID = B.LIBID
+                    AND W.DOCID = C.DOCID 
+                    AND W.AUTHORID = A.AUTHORID" ;
         if($pub != ""){
             $query .= " AND P.PUBNAME='$pub'";
         }
@@ -29,9 +31,11 @@
         $card = $_GET["card"];
         $libid = $row["LIBID"];
         $docid = $row["DOCID"];
+        $author = $row["ANAME"];
         echo "
                 <form action=action.php> 
                     <h3>$title</h3>
+                    <h4>$author</h4>
                     <p>$branch</p> 
                     <p>$pub</p>
                     <p>Doc Id: $docid</p>

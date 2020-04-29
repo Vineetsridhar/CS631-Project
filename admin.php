@@ -34,7 +34,9 @@ function getQueryByPerson($libid){
         FROM BORROWS AS B, READER AS R 
         WHERE B.READERID = R.READERID
         AND B.LIBID = '$libid'
-        GROUP BY B.READERID";
+        GROUP BY B.READERID
+        ORDER BY COUNT(*) DESC
+        LIMIT 10";
 }
 function printBookTable($db, $query){
     ($table = mysqli_query($db,$query)) or die (mysqli_error($db));
@@ -87,6 +89,40 @@ function printByYear($db){
     printBookTable($db, getQueryByYear());
 }
 
+function addCopy($db)
+{
+    echo "<center>
+        <p>Add a Document Copy:</p>
+        <form method = 'post'>
+        <input type=text placeholder='Document ID' name = 'id'/>
+        <input type=text placeholder='Copy Number' name='copy'/>
+        <input type=text placeholder='Library ID' name='libid'/>
+        <input type=text placeholder='Position' name='pos'/>
+        <input type='submit'/>
+        </form>
+        </center>";
+
+        if(isset($_POST['submit']))
+        {
+            $id = $_GET["Document ID"];
+            $copy = $_GET['Copy Number'];
+            $libID = $_GET["Library ID"];
+            $pos = $_GET["Position"];
+
+
+            $query = "INSERT INTO COPY (DOCID, COPYNO, LIBID, POSITION) VALUES ('$id', '$copy', '$libID', '$pos')";
+            ($worked = mysqli_query($db,$query)) or die (mysqli_error($db));
+
+            if ($worked == false)
+            {
+                echo "Invalid Document. Please Retype Document.";
+                mysqli_close($db);
+                return null;
+            }
+        }
+}
+
+
 $db = connect();
 $id = $_GET["id"];
 $password = $_GET["password"];
@@ -95,6 +131,7 @@ echo "<h1>Welcome $name</h1>";
 printByLibrary($db, 4, false); //For Book by branch
 printByLibrary($db, 4, true); //For People by branch
 printByYear($db); //For Book by year
+addCopy($db);
 mysqli_close($db);   
 
 ?>
