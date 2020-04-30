@@ -130,7 +130,7 @@ function findStatus($db)
         <form method = 'post'>
         <input type=text placeholder='Document ID' name = 'documentID'/>
         <input type=text placeholder='Copy Number' name='copy'/>
-        <input type=text placeholder='Library ID' name='libid;/>
+        <input type=text placeholder='Library ID' name='libid'/>
         <input type='submit' name='statusSubmit' value='Submit Query'/>
         </form>
         </center>";
@@ -140,7 +140,7 @@ function findStatus($db)
                 $documentID = (int)$_POST['documentID'];
                 $copy = (int)$_POST['copy'];
                 $libid = $_POST['libid'];
-                $query = "SELECT * FROM DOCUMENT 
+                $query = "SELECT * FROM COPY
                     WHERE DOCID = '$documentID' 
                     AND COPYNO = '$copy'
                     AND LIBID = '$libid'";
@@ -155,10 +155,10 @@ function findStatus($db)
                     WHERE DOCID = '$documentID' 
                     AND COPYNO = '$copy'
                     AND LIBID = '$libid'
-                    WHERE RDTIME IS NULL";
+                    AND RDTIME IS NULL";
                 ($table = mysqli_query($db,$query)) or die (mysqli_error($db));
 
-                if (mysqli_num_rows($table) == 0){
+                if (mysqli_num_rows($table) == 1){
                     echo "This book is not available";
                     return null;
                 } else{
