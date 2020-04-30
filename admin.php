@@ -99,7 +99,7 @@ function addCopy($db)
         <input type=text placeholder='Copy Number' name='copyNumber'/>
         <input type=text placeholder='Library ID' name='libid'/>
         <input type=text placeholder='Position' name='pos'/>
-        <input name='submit' type='submit'/>
+        <input name='copySubmit' type='submit'/>
         </form>
         </center>";
 
@@ -110,16 +110,13 @@ function addCopy($db)
             $libID = $_POST["libid"];
             $pos = $_POST["pos"];
 
-
             $query = "INSERT INTO COPY (DOCID, COPYNO, LIBID, POSITION) VALUES ('$Copyid', '$copy', '$libID', '$pos')";
-            ($worked = mysqli_query($db,$query)) or die (mysqli_error($db));
-
+            $worked = mysqli_query($db,$query);
             if ($worked == false)
             {
                 echo "Invalid Document. Please Retype Document.";
-                mysqli_close($db);
                 return null;
-            }
+            }else echo "Success!";
         }
 }
 
@@ -130,7 +127,7 @@ function findStatus($db)
         <form method = 'post'>
         <input type=text placeholder='Document ID' name = 'documentID'/>
         <input type=text placeholder='Copy Number' name='copy'/>
-        <input type=text placeholder='Library ID' name='libid'/>
+        <input type=text placeholder='Library ID' name='libraryid'/>
         <input type='submit' name='statusSubmit' value='Submit Query'/>
         </form>
         </center>";
@@ -139,7 +136,7 @@ function findStatus($db)
             {
                 $documentID = (int)$_POST['documentID'];
                 $copy = (int)$_POST['copy'];
-                $libid = $_POST['libid'];
+                $libid = $_POST['libraryid'];
                 $query = "SELECT * FROM COPY
                     WHERE DOCID = '$documentID' 
                     AND COPYNO = '$copy'
