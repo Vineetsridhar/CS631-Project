@@ -11,11 +11,13 @@
         $query = "SELECT DOCID, BDTIME FROM 
             BORROWS AS B, READER AS R
             WHERE R.CARDNUM='$cardno'
+            AND R.READERID = B.READERID
             AND B.RDTIME IS NULL
             UNION
             SELECT DOCID, RES.DTIME FROM 
             READER AS R, RESERVES AS RES
             WHERE R.CARDNUM='$cardno'
+            AND R.READERID = RES.READERID
             AND R.READERID = RES.READERID";
         
         ($table = mysqli_query($db,$query)) or die (mysqli_error($db));
