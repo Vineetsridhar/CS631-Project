@@ -126,6 +126,22 @@
         return $total * 0.2;
     }
 
+
+    function quit()
+    {
+        echo "<center>
+            <form method = 'POST'>
+            <input type='submit' name='quit' value='Quit'/>
+            </form>
+            </center>";
+                if(isset($_POST['quit']))
+                {
+                    header("Location: index.php");
+                    exit;
+                }
+    }
+
+
     $db = connect();
     $card = $_GET["cardnum"];
     $row = queryUser($db, $card);
@@ -137,7 +153,7 @@
     getBorrowedBooks($db, $card);
     printToScreen("<h3>Your Reserved Books...</h3>");
     getReservedBooks($db, $card);
-
+    quit();
     printToScreen("<br/>Fine: $" . getFine($db, $readerid));
     mysqli_close($db);
 ?>   
